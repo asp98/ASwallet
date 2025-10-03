@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gradient-to-tr from-purple-100 to-pink-100 min-h-screen">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About - ASWallt</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="font-sans text-gray-800 px-4 pb-24">
+
+<!-- Header -->
+<div id="header" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 shadow-md transform -translate-y-full transition-transform duration-500">
+  <div class="flex items-center justify-between px-4 py-3">
+    <h1 class="text-xl font-bold text-black">Documents</h1>
+    <i data-lucide="bell" class="text-black w-5 h-5"></i>
+  </div>
+</div>
+
+<!-- Spacer supaya konten tidak ketimpa header -->
+<div class="h-10"></div>
+
+<script>
+  // Biar header muncul dengan animasi slide-down
+  window.addEventListener("load", () => {
+    const header = document.getElementById("header");
+    setTimeout(() => {
+      header.classList.remove("-translate-y-full");
+    }, 100); // delay biar animasinya kelihatan
+  });
+</script>
+
+
+
+
+
+  <!-- Header -->
+  <div class="flex items-center justify-between py-4">
+    <button onclick="goBack()" class="text-black-600 flex items-center space-x-1">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      <span class="text-sm font-semibold">Back</span>
+    </button>
+    <h1 class="text-lg font-bold text-black-700">About Application</h1>
+    <span></span>
+  </div>
+
+  <!-- Content -->
+  <div class="bg-white p-6 rounded-xl shadow mt-4 space-y-4">
+    <div class="text-center">
+      <div class="w-16 h-16 mx-auto bg-purple-600 rounded-full flex items-center justify-center">
+        <i data-lucide="wallet" class="text-white w-8 h-8"></i>
+      </div>
+      <h2 class="text-xl font-bold mt-3 text-black-700">ASWallt</h2>
+      <p class="text-sm text-gray-500">Versi 18.0.0</p>
+    </div>
+
+    <div>
+      <h3 class="text-sm font-semibold text-gray-700 mb-1">Deskripsi</h3>
+      <p class="text-sm text-gray-600 leading-relaxed">
+        ASWallt is a versatile digital wallet application that makes it easy for you to store balance, make payments, top-up, withdraw cash, invest, and more. It is developed with a modern interface and progressive web technology."
+
+      </p>
+    </div>
+
+    <div>
+      <h3 class="text-sm font-semibold text-gray-700 mb-1">Developer</h3>
+      <p class="text-sm text-gray-600">ASEP SAHIDATULOH</p>
+    </div>
+
+    <div>
+      <h3 class="text-sm font-semibold text-gray-700 mb-1">Contact us</h3>
+      <p class="text-sm text-gray-600">Email: kopiwallet.support@email.com</p>
+      <p class="text-sm text-gray-600">Telegram: @kopiwallet</p>
+    </div>
+
+    <div class="text-center mt-6">
+      <p class="text-xs text-gray-400">© 2025 ASWallt. All rights reserved.</p>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-50">
+    <a href="dashboard.html" class="flex flex-col items-center text-gray-500">
+      <i data-lucide="home" class="w-5 h-5 mb-1"></i>
+      <span class="text-xs">Home</span>
+    </a>
+    <a href="card.html" class="flex flex-col items-center text-gray-500">
+      <i data-lucide="credit-card" class="w-5 h-5 mb-1"></i>
+      <span class="text-xs">Card</span>
+    </a>
+    <a href="home.html" class="flex flex-col items-center text-purple-600 font-semibold">
+      <i data-lucide="grid" class="w-5 h-5 mb-1"></i>
+      <span class="text-xs">Profile</span>
+    </a>
+  </div>
+
+  <!-- Script -->
+  <script>
+    lucide.createIcons();
+
+    function goBack() {
+      if (document.referrer) {
+        window.history.back();
+      } else {
+        window.location.href = "home.html";
+      }
+    }
+  </script>
+</body>
+</html>

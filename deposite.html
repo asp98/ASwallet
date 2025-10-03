@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id" class="bg-gradient-to-tr from-pink-200 to-purple-300 min-h-screen">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receive - ASWallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="font-sans text-gray-800 pb-24">
+
+<!-- Header -->
+<div id="header" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 shadow-md transform -translate-y-full transition-transform duration-500">
+  <div class="flex items-center justify-between px-4 py-3">
+    <h1 class="text-xl font-bold text-black">Receive</h1>
+    <i data-lucide="bell" class="text-black w-5 h-5"></i>
+  </div>
+</div>
+
+<!-- Spacer -->
+<div class="h-16"></div>
+
+<!-- Card utama -->
+<div class="max-w-md mx-auto mt-4 bg-white rounded-2xl shadow-lg p-6 space-y-6">
+
+  <!-- Pilih Token -->
+  <section>
+    <div class="flex justify-between items-center mb-2">
+      <label class="text-sm font-medium text-gray-700">Select Coin</label>
+      <button id="btn-select-token" class="text-sm text-gray-700 flex items-center gap-2">
+        <img id="tokenIconTop" src="images/Tether-logo.png" class="w-5 h-5 rounded-full" alt="">
+        <span id="tokenSymbolTop" class="font-semibold">USDT</span>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-4 border flex justify-between items-center">
+      <span class="text-gray-600 text-sm">Balance</span>
+      <span id="balanceView" class="text-gray-700 font-semibold">0 USDT</span>
+    </div>
+  </section>
+
+  <!-- Pilih Network -->
+  <section>
+    <label class="block mb-2 text-sm font-medium text-gray-700">Network</label>
+    <div class="bg-gray-50 rounded-xl p-4 border flex justify-between items-center">
+      <select id="network-select" class="flex-1 bg-transparent outline-none text-gray-700">
+        <option value="trc20">TRON (TRC20)</option>
+        <option value="erc20">Ethereum (ERC20)</option>
+        <option value="bep20">BNB Smart Chain (BEP20)</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Alamat Deposit -->
+  <section>
+    <label class="block mb-2 text-sm font-medium text-gray-700">Wallet Address</label>
+    <div class="bg-gray-50 rounded-xl p-4 border flex items-center justify-between">
+      <input type="text" id="deposit-address" readonly
+             value="TEXAMPLE1234567890ABCDEFGH"
+             class="bg-transparent text-gray-800 font-mono text-sm w-full outline-none">
+      <button id="copy-btn" class="ml-3 text-purple-600 hover:text-purple-800">
+        <i data-lucide="copy" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Info -->
+  <section>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-sm text-yellow-800">
+      ⚠️ Minimum deposit: <span class="font-semibold">2 USDT</span><br>
+      ⏱ Processing time: 1–5 menit
+    </div>
+  </section>
+
+  <!-- Tombol Done -->
+  <section>
+    <button onclick="window.location.href='dashboard.html'"
+      class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-full font-semibold hover:from-pink-500 hover:to-orange-400 transition">
+      Done
+    </button>
+  </section>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-200 flex justify-around py-3 z-50 shadow-lg">
+  <a href="dashboard.html" class="flex flex-col items-center text-purple-600 font-semibold hover:scale-110 transition">
+    <i data-lucide="home" class="w-6 h-6 mb-1"></i><span class="text-xs">Home</span>
+  </a>
+  <a href="card.html" class="flex flex-col items-center text-gray-500 hover:text-purple-600 hover:scale-110 transition">
+    <i data-lucide="credit-card" class="w-6 h-6 mb-1"></i><span class="text-xs">Card</span>
+  </a>
+  <a href="home.html" class="flex flex-col items-center text-gray-500 hover:text-purple-600 hover:scale-110 transition">
+    <i data-lucide="grid" class="w-6 h-6 mb-1"></i><span class="text-xs">Profile</span>
+  </a>
+</div>
+
+<!-- Bottom Sheet Pilih Token -->
+<div id="token-modal" class="fixed inset-0 bg-black/40 hidden z-50 flex items-end">
+  <div class="bg-white w-full rounded-t-2xl p-6 max-h-[70%] overflow-y-auto transform translate-y-full transition-transform duration-300">
+    <h2 class="text-lg font-semibold mb-4">Select Coin</h2>
+    <div id="token-list" class="space-y-3"></div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"
+     class="fixed bottom-1/2 left-1/2 transform -translate-x-1/2 translate-y-1/2 
+            bg-gradient-to-r from-purple-600 to-pink-500 text-white px-4 py-2 
+            rounded-lg shadow-lg opacity-0 transition-all duration-500 
+            flex items-center gap-2 z-50">
+  <i data-lucide="copy" class="w-4 h-4"></i>
+  <span id="toast-message">Alamat disalin!</span>
+</div>
+
+
+
+  <script>
+  lucide.createIcons();
+
+  // Animasi header slide-down
+  window.addEventListener("load", () => {
+    const header = document.getElementById("header");
+    setTimeout(() => header.classList.remove("-translate-y-full"), 100);
+  });
+
+  // Token list dengan alamat multi-network utk USDT & USDC
+  const tokens = [
+  
+  
+  { 
+      symbol: "BTC", icon: "btc.png", balance: 0.0,
+      networks: { default: "bc1q5hwg5mk6j2mps32nnpgd7uejg3x6n0trsq74ah" }
+    },
+  
+  
+    { 
+      symbol: "BNB", icon: "images/bnb.png", balance: 0.0,
+      networks: { default: "0x3f34D13102BDa644df14E21f63529625e96AF6b4" }
+    },
+    { 
+      symbol: "USDT", icon: "images/Tether-logo.png", balance: 0.0,
+      networks: {
+        trc20: "TYaF1wEFAMMs46kwEig9795Aj1qaTuak7L",
+        erc20: "0x3f34D13102BDa644df14E21f63529625e96AF6b4",
+        bep20: "0x3f34D13102BDa644df14E21f63529625e96AF6b4"
+      }
+    },
+    { 
+      symbol: "ETH", icon: "images/ethereum.png", balance: 0.0,
+      networks: { default: "0x3f34D13102BDa644df14E21f63529625e96AF6b4" }
+    },
+    { 
+      symbol: "TRX", icon: "images/tron-logo.png", balance: 0.0,
+      networks: { default: "TYaF1wEFAMMs46kwEig9795Aj1qaTuak7L" }
+    },
+    { 
+      symbol: "USDC", icon: "images/USD_Coin_icon.png", balance: 0.0,
+      networks: {
+        trc20: "TYaF1wEFAMMs46kwEig9795Aj1qaTuak7L",
+        erc20: "0x3f34D13102BDa644df14E21f63529625e96AF6b4",
+        bep20: "0x3f34D13102BDa644df14E21f63529625e96AF6b4"
+      }
+    }
+  ];
+
+  let selected = tokens[1]; // default USDT
+  const tokenSymbolTop = document.getElementById("tokenSymbolTop");
+  const tokenIconTop = document.getElementById("tokenIconTop");
+  const balanceView = document.getElementById("balanceView");
+  const tokenModal = document.getElementById("token-modal");
+  const tokenList = document.getElementById("token-list");
+  const depositAddress = document.getElementById("deposit-address");
+  const networkSelect = document.getElementById("network-select");
+
+  // Atur token terpilih
+  function setSelectedToken(t) {
+    selected = t;
+    tokenSymbolTop.textContent = t.symbol;
+    tokenIconTop.src = t.icon;
+    balanceView.textContent = `${t.balance} ${t.symbol}`;
+
+    // jika token punya multi network (USDT/USDC) aktifkan select
+    if (t.networks.trc20 || t.networks.erc20 || t.networks.bep20) {
+      networkSelect.disabled = false;
+      updateAddressByNetwork();
+    } else {
+      networkSelect.disabled = true;
+      depositAddress.value = t.networks.default;
+    }
+  }
+
+  // Update alamat saat network berubah
+  function updateAddressByNetwork() {
+    const net = networkSelect.value;
+    if (selected.networks[net]) {
+      depositAddress.value = selected.networks[net];
+    } else if (selected.networks.default) {
+      depositAddress.value = selected.networks.default;
+    }
+  }
+
+  // Event listener network select
+  networkSelect.addEventListener("change", updateAddressByNetwork);
+
+  // Set default
+  setSelectedToken(selected);
+
+  // Open modal
+  document.getElementById("btn-select-token").addEventListener("click", () => {
+    tokenModal.classList.remove("hidden");
+    tokenModal.querySelector("div").classList.remove("translate-y-full");
+  });
+
+  // Close modal
+  tokenModal.addEventListener("click", (e) => {
+    if (e.target === tokenModal) {
+      tokenModal.querySelector("div").classList.add("translate-y-full");
+      setTimeout(() => tokenModal.classList.add("hidden"), 300);
+    }
+  });
+
+  // Populate token list
+  tokens.forEach(t => {
+    const btn = document.createElement("button");
+    btn.className = "w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100";
+    btn.innerHTML = `
+      <img src="${t.icon}" class="w-6 h-6 rounded-full" alt="">
+      <span class="font-semibold">${t.symbol}</span>
+      <span class="ml-auto text-gray-500 text-sm">${t.balance}</span>
+    `;
+    btn.addEventListener("click", () => {
+      setSelectedToken(t);
+      tokenModal.querySelector("div").classList.add("translate-y-full");
+      setTimeout(() => tokenModal.classList.add("hidden"), 300);
+    });
+    tokenList.appendChild(btn);
+  });
+
+  // Copy address with toast
+  document.getElementById("copy-btn").addEventListener("click", () => {
+    navigator.clipboard.writeText(depositAddress.value);
+    const toast = document.getElementById("toast");
+    toast.classList.remove("opacity-0");
+    setTimeout(() => toast.classList.add("opacity-0"), 2000);
+  });
+</script>
+</body>
+</html>

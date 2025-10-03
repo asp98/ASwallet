@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ASwallet Auth</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-b from-pink-100 to-purple-100 min-h-screen flex flex-col items-center justify-start p-6">
+
+  <!-- Welcome Header -->
+  <div class="w-full flex justify-between items-center mt-2">
+    <button class="bg-gray-200 text-sm px-3 py-1 rounded-full">Welcome</button>
+  </div>
+
+  <!-- Logo -->
+  <div class="mt-6 mb-4">
+    <h1 class="text-4xl font-bold text-black-700 rotate-[-5deg] tracking-wider">
+      AS<span class="bg-purple-500 text-white px-2 py-1 rounded-md">wallet</span>
+    </h1>
+  </div>
+
+  <!-- Tab Container -->
+  <div class="w-full max-w-md bg-white rounded-2xl shadow p-6">
+    <div class="flex justify-around border-b pb-3 mb-4">
+      <button id="tab-login" class="text-purple-600 font-semibold border-b-2 border-purple-600">Sign in</button>
+      <button id="tab-register" class="text-gray-400 font-semibold">Sign up</button>
+    </div>
+
+    <!-- Sign In Form -->
+    <form id="form-login" class="space-y-4">
+      <div>
+        <label class="text-sm font-medium">Email <span class="text-red-500">*</span></label>
+        <input type="email" required placeholder="Enter your email" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" required placeholder="Enter your password" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none pr-10" />
+          <span class="absolute right-3 top-4 text-gray-500 cursor-pointer" onclick="togglePassword(this)">👁</span>
+        </div>
+      </div>
+      <button type="submit" class="w-full bg-purple-600 text-white font-semibold py-3 rounded-full">Log in</button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="form-register" class="space-y-4 hidden">
+      <div>
+        <label class="text-sm font-medium">Name <span class="text-red-500">*</span></label>
+        <input type="text" required placeholder="Enter your name" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Surname <span class="text-red-500">*</span></label>
+        <input type="text" required placeholder="Enter your surname" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Email <span class="text-red-500">*</span></label>
+        <input type="email" required placeholder="Enter your email" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" required placeholder="Enter your password" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none pr-10" />
+          <span class="absolute right-3 top-4 text-gray-500 cursor-pointer" onclick="togglePassword(this)">👁</span>
+        </div>
+      </div>
+      <div>
+        <label class="text-sm font-medium">Confirm Password <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="password" required placeholder="Confirm your password" class="w-full mt-1 p-3 rounded-xl border border-gray-300 focus:outline-none pr-10" />
+          <span class="absolute right-3 top-4 text-gray-500 cursor-pointer" onclick="togglePassword(this)">👁</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 text-sm">
+        <input type="checkbox" class="w-4 h-4 rounded" required />
+        <p>I accept the <a href="#" class="text-purple-600 underline">Terms</a> & <a href="#" class="text-purple-600 underline">Privacy Policy</a></p>
+      </div>
+      <button type="submit" class="w-full bg-purple-600 text-white font-semibold py-3 rounded-full">Continue</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <p class="text-xs text-gray-500 mt-4">© 2025 ASwallet</p>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-white/80 flex items-center justify-center hidden z-50">
+    <div class="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <!-- JS -->
+ <script>
+  function togglePassword(icon) {
+    const input = icon.previousElementSibling;
+    input.type = input.type === "password" ? "text" : "password";
+  }
+
+  // Tab switch logic
+  const loginTab = document.getElementById("tab-login");
+  const registerTab = document.getElementById("tab-register");
+  const loginForm = document.getElementById("form-login");
+  const registerForm = document.getElementById("form-register");
+
+  loginTab.addEventListener("click", () => {
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
+    loginTab.classList.add("text-purple-600", "border-b-2", "border-purple-600");
+    registerTab.classList.remove("text-purple-600", "border-b-2", "border-purple-600");
+    registerTab.classList.add("text-gray-400");
+  });
+
+  registerTab.addEventListener("click", () => {
+    loginForm.classList.add("hidden");
+    registerForm.classList.remove("hidden");
+    registerTab.classList.add("text-purple-600", "border-b-2", "border-purple-600");
+    loginTab.classList.remove("text-purple-600", "border-b-2", "border-purple-600");
+    loginTab.classList.add("text-gray-400");
+  });
+
+  // Login Logic
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const email = this.querySelector("input[type=email]").value.trim();
+    const password = this.querySelector("input[type=password]").value;
+
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const found = users.find(u => u.email === email && u.password === password);
+
+    if (found) {
+      localStorage.setItem("loggedInUser", JSON.stringify(found));
+
+      // Show loading overlay
+      document.getElementById("loadingOverlay").classList.remove("hidden");
+
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 2000);
+    } else {
+      alert("Email atau password salah!");
+    }
+  });
+
+  // Register Logic
+  registerForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const inputs = this.querySelectorAll("input");
+    const name = inputs[0].value.trim();
+    const surname = inputs[1].value.trim();
+    const email = inputs[2].value.trim();
+    const password = inputs[3].value;
+    const confirmPassword = inputs[4].value;
+    const agree = inputs[5].checked;
+
+    if (password !== confirmPassword) return alert("Password tidak cocok!");
+    if (!agree) return alert("Setujui Syarat dan Ketentuan.");
+
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.some(u => u.email === email)) return alert("Email sudah terdaftar!");
+
+    const newUser = {
+      name, surname, email, password,
+      saldo: 2360,
+      aset: {
+      bitcoin: 2,
+      TRX: 230,
+        tether: 40700,
+        ethereum: 430,
+        tron: 15080,
+        usdc: 25800
+      },
+      address: "ASW" + Math.random().toString(36).substring(2, 10).toUpperCase(),
+      transactions: []
+    };
+
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("loggedInUser", JSON.stringify(newUser));
+
+    // Show loading overlay
+    document.getElementById("loadingOverlay").classList.remove("hidden");
+
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 2000);
+  });
+</script>
+</body>
+</html>

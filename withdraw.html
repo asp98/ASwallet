@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Real-Time Transfer • ASwallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    /* Toggle */
+    .toggle-wrapper { width: 44px; height: 24px; position: relative; display:inline-block; }
+    .toggle-checkbox { appearance: none; width: 100%; height: 100%; border-radius: 9999px; background: #e5e7eb; position: relative; cursor: pointer; outline: none; border: 2px solid transparent; }
+    .toggle-checkbox:after { content: ""; width: 18px; height: 18px; background: #fff; border-radius: 9999px; position: absolute; top: 50%; left: 3px; transform: translateY(-50%); transition: left .18s, transform .18s; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+    .toggle-checkbox:checked { background: #9333EA; }
+    .toggle-checkbox:checked:after { left: calc(100% - 21px); }
+
+    .modal { transition: opacity 0.25s, transform 0.25s; }
+    .progress-bar { transition: width 0.4s ease-in-out; }
+    .network-indicator { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%{opacity:.6}50%{opacity:1}100%{opacity:.6} }
+    .transaction-success { animation: success .45s ease-out; }
+    @keyframes success { 0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1} }
+    .top-shadow {
+      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen text-gray-800">
+<!-- Header Melayang -->
+<header class="fixed top-0 w-full z-50 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 shadow-md">
+  <div class="max-w-2xl mx-auto flex items-center justify-between px-4 py-3">
+    <button id="btn-back" aria-label="Back" class="p-2 rounded-full hover:bg-white/20">
+      <i data-lucide="chevron-left" class="w-5 h-5 text-white"></i>
+    </button>
+    <h1 class="text-xl font-bold text-white">Real-Time Transfer</h1>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center bg-white/20 rounded-full px-2 py-1">
+        <span class="text-xs font-medium text-white mr-2">USD</span>
+        <label class="toggle-wrapper" title="Toggle currency">
+          <input id="currency-toggle" type="checkbox" class="toggle-checkbox" aria-label="Toggle currency to IDR" />
+        </label>
+        <span class="text-xs font-medium text-white ml-2">IDR</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+
+
+<div class="bg-blue-50 border-b border-blue-200 py-0 px-4 flex items-center justify-center">
+  <div class="flex items-center text-blue-700 text-sm">
+    <span class="network-indicator w-2 h-2 bg-blue-500 rounded-full mr-2" aria-hidden="true"></span>
+    <span>Connected to BSC Mainnet</span>
+  </div>
+</div>
+
+<main class="max-w-2xl mx-auto p-2 pb-28 space-y-6 mt-16" role="main" aria-label="Transfer form">
+
+
+
+  <!-- Recipient -->
+  <section>
+    <div class="flex justify-between items-center mb-2">
+      <label for="input-to" class="text-sm font-medium text-gray-700">Recipient Address</label>
+      <button id="btn-pilih-wallet" class="text-sm text-purple-600 flex items-center gap-1" aria-haspopup="true">
+        <i data-lucide="bookmark" class="w-4 h-4"></i>
+        <span>Select Wallet</span>
+      </button>
+    </div>
+    <div class="bg-white rounded-xl p-3 flex items-center gap-3 border shadow-sm">
+      <input id="input-to" type="text" class="flex-1 text-gray-800 placeholder-gray-400 bg-transparent outline-none" placeholder="Enter recipient address" aria-label="Recipient address" />
+      <button id="btn-scan" class="p-2 text-gray-400 hover:text-purple-600" aria-label="Scan QR code">
+        <i data-lucide="scan" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Amount -->
+  <section>
+    <div class="flex justify-between items-center mb-2">
+      <label for="input-amount" class="text-sm font-medium text-gray-700">Amount</label>
+      <button id="btn-select-token" class="text-sm text-gray-500 flex items-center gap-2" aria-haspopup="true">
+        <span id="tokenSymbolTop" class="font-semibold text-purple-600">BNB</span>
+        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="bg-white rounded-xl p-4 border shadow-sm">
+      <div class="relative w-full">
+        <input id="input-amount" type="number" min="0" step="any" class="w-full text-2xl font-medium text-gray-800 placeholder-gray-400 outline-none pr-20" placeholder="0.0" aria-label="Amount" />
+        <button id="btn-all" class="absolute inset-y-0 right-0 my-auto text-xs border border-purple-200 text-purple-600 px-2 h-6 flex items-center justify-center rounded-full bg-purple-50" aria-label="Use max balance">MAX</button>
+      </div>
+
+      <div class="h-px my-3 bg-gray-100"></div>
+      <div class="flex justify-between text-sm text-gray-500">
+        <div>Balance</div>
+        <div id="balanceView" aria-live="polite">0 BNB</div>
+      </div>
+      <div class="flex justify-between text-xs text-gray-400 mt-1">
+        <div>Equivalent</div>
+        <div id="equivalentView">≈ $0.00</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Network fees -->
+  <section>
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-gray-700">Network fees</span>
+        <button id="btn-help" class="text-gray-400" title="Info" aria-label="Network fee info"><i data-lucide="info" class="w-4 h-4"></i></button>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btn-refresh" class="text-sm text-blue-600 flex items-center gap-2" aria-label="Refresh fees">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          <span id="refreshTimer">Update</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 border shadow-sm">
+      <div class="flex justify-between text-sm">
+        <div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="zap" class="w-5 h-5 text-orange-500"></i>
+            <div>
+              <div class="font-medium">Standard</div>
+              <div class="text-xs text-gray-500">Confirms in ~5 sec</div>
+            </div>
+          </div>
+        </div>
+        <div class="text-right text-sm">
+          <div class="text-xs text-gray-500">Estimated fee</div>
+          <div id="feeEstimate" class="font-medium">$0.10 <span class="text-gray-400 text-xs">0.0005 BNB</span></div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex justify-between text-xs text-gray-500 mb-1">
+          <span>Gas price</span>
+          <span id="gasPrice">5 Gwei</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="gasProgress" class="bg-purple-600 h-2 rounded-full progress-bar" style="width: 50%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 mt-1">
+          <span>Slow</span>
+          <span>Fast</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Note -->
+  <section>
+    <div class="bg-gray rounded-xl p-2 border shadow-sm">
+      <label for="input-note" class="text-sm font-medium text-gray-800 mb-0 block">Note (Optional)</label>
+      <textarea id="input-note" class="w-full text-gray-800 placeholder-gray-400 bg-transparent outline-none resize-none" placeholder="Add a note to this transaction" rows="2" aria-label="Transaction note"></textarea>
+    </div>
+  </section>
+</main>
+
+<!-- Footer confirm -->
+<div class="fixed bottom-0 left-0 right-0 bg-white top-shadow p-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="flex justify-between items-center mb-2 text-sm text-gray-500">
+      <span>Total</span>
+      <span id="totalAmount">0.00 BNB</span>
+    </div>
+    <button id="btn-confirm" class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl text-lg font-semibold shadow-md hover:shadow-lg transition-shadow" aria-label="Review transfer">
+      Review Transfer
+    </button>
+  </div>
+</div>
+
+<!-- Modal Pilih Token -->
+<div id="tokenModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-lg w-80 p-4">
+    <h2 class="text-lg font-semibold mb-3">Select Token</h2>
+    <ul class="divide-y">
+        
+        <ul class="divide-y divide-gray-200">
+  <li class="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-gray-100" data-token="BNB">
+    <img src="images/bnb.png" alt="BNB" class="w-5 h-5">
+    BNB
+  </li>
+  <li class="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-gray-100" data-token="ETH">
+    <img src="images/ethereum.png" alt="ETH" class="w-5 h-5">
+    ETH
+  </li>
+  <li class="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-gray-100" data-token="USDT">
+    <img src="images/Tether-logo.png" alt="USDT" class="w-5 h-5">
+    USDT
+  </li>
+  <li class="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-gray-100" data-token="BTC">
+    <img src="images/btc.png" alt="BTC" class="w-5 h-5">
+    BTC
+  </li>
+  <li class="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-gray-100" data-token="TRX">
+    <img src="images/tron-logo.png" alt="TRX" class="w-5 h-5">
+    TRX
+  </li>
+  <li class="flex items-center gap-2 py-2 px-3 cursor-pointer hover:bg-gray-100" data-token="USDC">
+    <img src="images/USD_Coin_icon.png" alt="USDC" class="w-5 h-5">
+    USDC
+  </li>
+</ul>
+
+<button id="closeTokenModal" 
+        class="mt-3 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+  Close
+</button>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirmModalBackdrop" class="fixed inset-0 bg-black/40 hidden z-50 transition-opacity" aria-hidden="true"></div>
+<div id="confirmModal" class="fixed inset-0 hidden z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="bg-white rounded-xl p-6 w-full max-w-md modal transform transition-all">
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="confirmTitle" class="text-lg font-semibold">Confirm Transfer</h3>
+      <button id="confirmModalClose" class="text-gray-500 hover:text-gray-700" aria-label="Close confirm modal">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-600">From :</span>
+        <span class="text-sm font-medium">TUouaiPNuWAcqyMJr5dzNTBtsTvm3sReNJ</span>
+      </div>
+
+      <div class="flex justify-between items-start">
+        <span class="text-sm text-gray-600">To</span>
+        <span id="confirm-to" class="text-sm font-medium text-right max-w-[60%] break-all">-</span>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-600">Amount</span>
+        <div class="text-right">
+          <span id="confirm-amount" class="text-sm font-medium">-</span>
+          <div id="confirm-amount-equivalent" class="text-xs text-gray-500">-</div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-600">Network Fee</span>
+        <div class="text-right">
+          <span id="confirm-fee" class="text-sm font-medium">-</span>
+          <div id="confirm-fee-equivalent" class="text-xs text-gray-500">-</div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t">
+        <span class="text-sm font-medium text-gray-700">Total</span>
+        <div class="text-right">
+          <span id="confirm-total" class="text-sm font-medium">-</span>
+          <div id="confirm-total-equivalent" class="text-xs text-gray-500">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-1">
+      <button id="confirm-send" class="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white py-3 rounded-xl text-lg font-semibold transition-all shadow-md" aria-label="Confirm and send">
+        Confirm & Send
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Processing Modal -->
+<div id="processingModal" class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center p-4" aria-hidden="true">
+  <div class="bg-white rounded-xl p-6 w-full max-w-md text-center">
+    <div class="flex justify-center mb-4">
+      <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+        <i data-lucide="loader" class="w-6 h-6 text-blue-600 animate-spin"></i>
+      </div>
+    </div>
+    <h3 class="text-lg font-semibold mb-2">Processing Transaction</h3>
+    <p class="text-gray-600 text-sm mb-4">Processing your transaction on the blockchain.</p>
+
+    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+      <div id="progressBar" class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="text-xs text-gray-500 mb-1" id="progressText">Initializing...</div>
+    <div class="text-xs text-gray-400" id="transactionHash" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center p-4" aria-hidden="true">
+  <div class="bg-white rounded-xl p-6 w-full max-w-md text-center transaction-success">
+    <div class="flex justify-center mb-4">
+      <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+        <i data-lucide="check" class="w-8 h-8 text-green-600"></i>
+      </div>
+    </div>
+    <h3 class="text-lg font-semibold mb-2">Transaction Successful!</h3>
+    <p class="text-gray-600 text-sm mb-4">Your transaction has been confirmed on the blockchain.</p>
+
+    <div class="bg-gray-50 rounded-lg p-3 text-left mb-4">
+      <div class="flex justify-between text-sm mb-2">
+        <span class="text-gray-500">Amount:</span>
+        <span id="success-amount" class="font-medium">-</span>
+      </div>
+      <div class="flex justify-between text-sm mb-2">
+        <span class="text-gray-500">To:</span>
+        <span id="success-to" class="font-medium text-right max-w-[60%] truncate">-</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-500">Transaction ID:</span>
+        <button id="success-txid" class="font-medium text-blue-600 underline text-left" aria-label="View transaction">View</button>
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <button id="success-done" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-xl font-medium">
+        Done
+      </button>
+      <button id="success-view" class="flex-1 bg-purple-600 text-white py-3 rounded-xl font-medium">
+        View Details
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+    
+    
+   
+ 
+    
+  // Initialize icons AFTER DOM (safer)
+  document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+
+  // ---------- State ----------
+  let isIDRMode = false;
+  let usdToIdrRate = 16400; // default, can be updated by API later
+  const tokens = [
+  { symbol: 'BNB', priceUSD: 1001.95, balance: 2907.15 },
+  { symbol: 'ETH', priceUSD: 4490.50, balance: 1.25 },
+  { symbol: 'USDT', priceUSD: 1.00, balance: 9890 },
+  { symbol: 'BTC', priceUSD: 120500.75, balance: 6.15 },
+  { symbol: 'TRX', priceUSD: 0.3487, balance: 548.15 },
+  { symbol: 'USDC', priceUSD: 1.00, balance: 327.05 }
+];
+    
+ 
+  let selected = tokens[0];
+  let feeEst = { estimateUSD: 0.10, estimateToken: 0.0005 };
+  let refreshCountdown = 30;
+  let refreshTimerId = null;
+
+  // ---------- Elements ----------
+  const tokenSymbolTop = document.getElementById('tokenSymbolTop');
+  const balanceView = document.getElementById('balanceView');
+  const equivalentView = document.getElementById('equivalentView');
+  const inputAmount = document.getElementById('input-amount');
+  const btnAll = document.getElementById('btn-all');
+  const inputTo = document.getElementById('input-to');
+  const btnRefresh = document.getElementById('btn-refresh');
+  const refreshTimer = document.getElementById('refreshTimer');
+  const feeEstimateEl = document.getElementById('feeEstimate');
+  const gasPriceEl = document.getElementById('gasPrice');
+  const gasProgress = document.getElementById('gasProgress');
+  const totalAmountEl = document.getElementById('totalAmount');
+  const btnConfirm = document.getElementById('btn-confirm');
+  const confirmModal = document.getElementById('confirmModal');
+  const confirmModalBackdrop = document.getElementById('confirmModalBackdrop');
+  const confirmModalClose = document.getElementById('confirmModalClose');
+  const confirmTo = document.getElementById('confirm-to');
+  const confirmAmount = document.getElementById('confirm-amount');
+  const confirmAmountEquivalent = document.getElementById('confirm-amount-equivalent');
+  const confirmFee = document.getElementById('confirm-fee');
+  const confirmFeeEquivalent = document.getElementById('confirm-fee-equivalent');
+  const confirmTotal = document.getElementById('confirm-total');
+  const confirmTotalEquivalent = document.getElementById('confirm-total-equivalent');
+  const confirmSend = document.getElementById('confirm-send');
+  const processingModal = document.getElementById('processingModal');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const transactionHashEl = document.getElementById('transactionHash');
+  const successModal = document.getElementById('successModal');
+  const successAmount = document.getElementById('success-amount');
+  const successTo = document.getElementById('success-to');
+  const successTxid = document.getElementById('success-txid');
+  const successDone = document.getElementById('success-done');
+  const successView = document.getElementById('success-view');
+  const currencyToggle = document.getElementById('currency-toggle');
+  const btnSelectToken = document.getElementById("btn-select-token");
+  const tokenModal = document.getElementById("tokenModal");
+  const closeTokenModal = document.getElementById("closeTokenModal");
+  const btnScan = document.getElementById("btn-scan");
+  const btnPilihWallet = document.getElementById("btn-pilih-wallet");
+  const btnHelp = document.getElementById("btn-help");
+
+  // ---------- Token Modal ----------
+  btnSelectToken.addEventListener("click", () => {
+    tokenModal.classList.remove("hidden");
+    tokenModal.classList.add("flex");
+  });
+
+  closeTokenModal.addEventListener("click", () => {
+    tokenModal.classList.add("hidden");
+  });
+
+  // Pilih token
+  document.querySelectorAll("#tokenModal li").forEach(item => {
+    item.addEventListener("click", () => {
+      const selectedTokenSymbol = item.getAttribute("data-token");
+      const selectedToken = tokens.find(token => token.symbol === selectedTokenSymbol);
+      if (selectedToken) {
+        setSelectedToken(selectedToken);
+      }
+      tokenModal.classList.add("hidden");
+    });
+  });
+
+  // ---------- Format helpers ----------
+  function formatRupiah(amount) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+  }
+  
+  function formatDollar(amount) {
+    // reasonable USD formatting: 2 decimal places for values >= 1, more decimals for tiny values
+    if (Math.abs(amount) >= 1) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+    } else {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 6, maximumFractionDigits: 8 }).format(amount);
+    }
+  }
+
+  // ---------- UI updates ----------
+  function updateBalanceDisplay() {
+    const balance = Number(selected.balance);
+    const priceUSD = Number(selected.priceUSD);
+    const balanceUSD = balance * priceUSD;
+
+    if (isIDRMode) {
+      const balanceIDR = balanceUSD * usdToIdrRate;
+      balanceView.textContent = `${formatRupiah(balanceIDR)}`;
+      equivalentView.textContent = `≈ ${formatDollar(balanceUSD)}`;
+    } else {
+      balanceView.textContent = `${Number(balance.toFixed(6))} ${selected.symbol}`;
+      equivalentView.textContent = `≈ ${formatDollar(balanceUSD)}`;
+    }
+    updateTotalDisplay();
+  }
+
+  function updateFeeDisplay() {
+    // ensure numeric
+    feeEst.estimateUSD = Number(feeEst.estimateUSD);
+    feeEst.estimateToken = Number(feeEst.estimateToken);
+
+    if (isIDRMode) {
+      const feeIDR = feeEst.estimateUSD * usdToIdrRate;
+      feeEstimateEl.innerHTML = `${formatRupiah(feeIDR)} <span class="text-gray-400 text-xs">(${feeEst.estimateToken.toFixed(6)} ${selected.symbol})</span>`;
+    } else {
+      feeEstimateEl.innerHTML = `${formatDollar(feeEst.estimateUSD)} <span class="text-gray-400 text-xs">(${feeEst.estimateToken.toFixed(6)} ${selected.symbol})</span>`;
+    }
+    updateTotalDisplay();
+  }
+
+  function updateTotalDisplay() {
+    const amount = Number(inputAmount.value) || 0;
+    const totalToken = amount + Number(feeEst.estimateToken || 0);
+    const totalUSD = (amount * Number(selected.priceUSD)) + Number(feeEst.estimateUSD || 0);
+
+    if (isIDRMode) {
+      const totalIDR = totalUSD * usdToIdrRate;
+      totalAmountEl.textContent = `${formatRupiah(totalIDR)}`;
+    } else {
+      totalAmountEl.textContent = `${totalToken.toFixed(8)} ${selected.symbol}`;
+    }
+  }
+
+  // ---------- Currency toggle ----------
+  currencyToggle.addEventListener('change', function() {
+    isIDRMode = this.checked;
+    updateBalanceDisplay();
+    updateFeeDisplay();
+  });
+
+  // ---------- Initialization ----------
+  function initUI() {
+    setSelectedToken(selected);
+    startRefreshTimer();
+
+    inputTo.value = "";
+    inputAmount.value = "";
+    updateTotalDisplay();
+  }
+
+  function setSelectedToken(t) {
+    selected = t;
+    tokenSymbolTop.textContent = t.symbol;
+    updateBalanceDisplay();
+    updateFeeDisplay();
+  }
+
+  // ---------- Max button ----------
+  btnAll.addEventListener('click', () => {
+    inputAmount.value = Number(selected.balance).toFixed(6);
+    updateTotalDisplay();
+  });
+
+  inputAmount.addEventListener('input', updateTotalDisplay);
+
+  // ---------- Fee refresh simulation ----------
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  function refreshFee() {
+    const randFactor = (Math.random() * 0.4) + 0.8;
+    // keep numeric
+    feeEst.estimateUSD = Number((0.08 * randFactor).toFixed(4));
+    feeEst.estimateToken = Number((0.0004 * randFactor).toFixed(8));
+
+    const gasPrice = 3 + Math.floor(Math.random() * 7);
+    gasPriceEl.textContent = `${gasPrice} Gwei`;
+
+    // gasProgress width scaled between 10% - 95%
+    const width = clamp(10 + (gasPrice - 1) * 12, 10, 95);
+    gasProgress.style.width = `${width}%`;
+
+    updateFeeDisplay();
+  }
+
+  btnRefresh.addEventListener('click', () => {
+    refreshFee();
+    resetRefreshTimer();
+  });
+
+  // ---------- refresh timer ----------
+  function startRefreshTimer() {
+    if (refreshTimerId) clearInterval(refreshTimerId);
+    refreshCountdown = 30;
+    refreshTimer.textContent = `Update in ${refreshCountdown}s`;
+    refreshTimerId = setInterval(() => {
+      refreshCountdown--;
+      if (refreshCountdown <= 0) {
+        refreshFee();
+        refreshCountdown = 30;
+      }
+      refreshTimer.textContent = `Update in ${refreshCountdown}s`;
+    }, 1000);
+  }
+  
+  function resetRefreshTimer() { startRefreshTimer(); }
+
+  // ---------- Confirm modal ----------
+  function openConfirmModal() {
+    const to = inputTo.value.trim();
+    const amount = Number(inputAmount.value) || 0;
+    const amountUSD = amount * Number(selected.priceUSD);
+    const feeUSD = Number(feeEst.estimateUSD);
+    const totalToken = amount + Number(feeEst.estimateToken);
+    const totalUSD = amountUSD + feeUSD;
+
+    confirmTo.textContent = to || '-';
+
+    if (isIDRMode) {
+      confirmAmount.textContent = formatRupiah(amountUSD * usdToIdrRate);
+      confirmAmountEquivalent.textContent = `${amount} ${selected.symbol}`;
+
+      confirmFee.textContent = formatRupiah(feeUSD * usdToIdrRate);
+      confirmFeeEquivalent.textContent = `${Number(feeEst.estimateToken).toFixed(8)} ${selected.symbol}`;
+
+      confirmTotal.textContent = formatRupiah(totalUSD * usdToIdrRate);
+      confirmTotalEquivalent.textContent = `${totalToken.toFixed(8)} ${selected.symbol}`;
+    } else {
+      confirmAmount.textContent = `${amount} ${selected.symbol}`;
+      confirmAmountEquivalent.textContent = formatDollar(amountUSD);
+
+      confirmFee.textContent = `${Number(feeEst.estimateToken).toFixed(8)} ${selected.symbol}`;
+      confirmFeeEquivalent.textContent = formatDollar(feeUSD);
+
+      confirmTotal.textContent = `${totalToken.toFixed(8)} ${selected.symbol}`;
+      confirmTotalEquivalent.textContent = formatDollar(totalUSD);
+    }
+
+    confirmModalBackdrop.classList.remove('hidden');
+    confirmModal.classList.remove('hidden');
+  }
+
+  function closeConfirmModal() {
+    confirmModalBackdrop.classList.add('hidden');
+    confirmModal.classList.add('hidden');
+  }
+
+  // ---------- Validation before open ----------
+  btnConfirm.addEventListener('click', () => {
+    const to = inputTo.value.trim();
+    const amount = Number(inputAmount.value);
+    if (!to) { alert('Please enter destination address.'); return; }
+    if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount.'); return; }
+    if (amount + Number(feeEst.estimateToken) > Number(selected.balance)) {
+      alert('Insufficient balance for amount + fee.');
+      return;
+    }
+    openConfirmModal();
+  });
+
+  confirmModalClose.addEventListener('click', closeConfirmModal);
+  confirmModalBackdrop.addEventListener('click', (e) => {
+    if (e.target === confirmModalBackdrop) closeConfirmModal();
+  });
+
+  // ---------- blockchain ----------
+  function simulateBlockchainTransaction() {
+    closeConfirmModal();
+    processingModal.classList.remove('hidden');
+
+    let progress = 0;
+    let txHash = '';
+    const interval = setInterval(() => {
+      progress += Math.random() * 12;
+      progress = Math.min(progress, 100);
+      progressBar.style.width = `${progress}%`;
+
+      if (progress < 30) progressText.textContent = "Initializing transaction...";
+      else if (progress < 60) progressText.textContent = "Signing transaction...";
+      else if (progress < 90) progressText.textContent = "Broadcasting to network...";
+      else progressText.textContent = "Waiting for confirmation...";
+
+      if (!txHash && progress >= 40) {
+        txHash = "0x" + Math.random().toString(16).substr(2, 64);
+        transactionHashEl.textContent = `TXID: ${txHash.substr(0, 12)}...${txHash.substr(52)}`;
+      }
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          processingModal.classList.add('hidden');
+          showSuccessModal(txHash);
+        }, 900);
+      }
+    }, 260);
+  }
+
+  function showSuccessModal(txHash) {
+    const to = inputTo.value.trim();
+    const amount = Number(inputAmount.value) || 0;
+    if (isIDRMode) {
+      const amountIDR = (amount * selected.priceUSD) * usdToIdrRate;
+      successAmount.textContent = formatRupiah(amountIDR);
+    } else {
+      successAmount.textContent = `${amount} ${selected.symbol}`;
+    }
+    successTo.textContent = to;
+    successTxid.textContent = txHash ? txHash.substr(0,10) + '...' + txHash.substr(-8) : '—';
+    successModal.classList.remove('hidden');
+
+    // update balance safely
+    selected.balance = Number(selected.balance) - amount - Number(feeEst.estimateToken || 0);
+    selected.balance = Number(selected.balance.toFixed(8));
+    updateBalanceDisplay();
+    updateFeeDisplay();
+  }
+
+  confirmSend.addEventListener('click', simulateBlockchainTransaction);
+
+  // success modal buttons
+  successDone.addEventListener('click', () => successModal.classList.add('hidden'));
+  successView.addEventListener('click', () => {
+    successModal.classList.add('hidden');
+    alert('In a real app this would open the tx on a blockchain explorer.');
+  });
+  successTxid.addEventListener('click', () => alert('Open explorer '));
+
+  // other small handlers
+  document.getElementById('btn-back').addEventListener('click', () => window.history.back());
+  btnHelp.addEventListener('click', () => alert('Network fees are paid to miners/validators to process transactions. Higher fees usually confirm faster.'));
+  btnScan.addEventListener('click', () => alert('QR scan coming soon in rill.'));
+  btnPilihWallet.addEventListener('click', () => alert('Show saved addresses '));
+
+  // init
+  initUI();
+  refreshFee();
+</script>
+</body>
+</html>

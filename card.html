@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gradient-to-tr from-pink-200 to-purple-300 min-h-screen">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Card - Aswallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="text-gray-800 font-sans pb-28">
+
+  
+  
+
+
+<!-- Header -->
+<div id="header" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 shadow-md transform -translate-y-full transition-transform duration-500">
+  <div class="flex items-center justify-between px-4 py-3">
+    <h1 class="text-xl font-bold text-black">Card</h1>
+    <i data-lucide="bell" class="text-black w-5 h-5"></i>
+  </div>
+</div>
+
+<!-- Spacer supaya konten tidak ketimpa header -->
+<div class="h-16"></div>
+
+<script>
+  // Biar header muncul dengan animasi slide-down
+  window.addEventListener("load", () => {
+    const header = document.getElementById("header");
+    setTimeout(() => {
+      header.classList.remove("-translate-y-full");
+    }, 100); // delay biar animasinya kelihatan
+  });
+</script>
+
+
+
+  <!-- Virtual Card -->
+  <div class="mx-4 mt-2">
+    <div class="rounded-2xl bg-black p-6 text-white relative overflow-hidden shadow-lg">
+      <!-- Logo -->
+      <h1 class="text-2xl font-bold tracking-wide mb-10 text-orange-400">AS<span class="text-white">wallet</span></h1>
+      <!-- Card Info -->
+      <div>
+        <p class="tracking-widest mb-4 text-sm">CARD HOLDER</p>
+        <p class="text-2xl tracking-[.3em] font-mono">•••• 0000</p>
+      </div>
+      <!-- Mastercard logo -->
+      <div class="absolute bottom-5 right-6">
+        <div class="w-10 h-10 bg-red-500 rounded-full absolute"></div>
+        <div class="w-10 h-10 bg-yellow-400 rounded-full absolute left-3 mix-blend-multiply"></div>
+      </div>
+      <!-- NFC Icon -->
+      <div class="absolute top-4 right-4">
+        <svg class="w-6 h-6 text-white opacity-80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M2 12a10 10 0 0110-10m0 0a10 10 0 010 20m0-20v20"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Cost -->
+  <div class="text-center mt-6">
+    <p class="text-sm text-gray-800 font-medium">Card cost: <strong>50.00 USDT</strong></p>
+  </div>
+
+  <!-- Buy Button -->
+  <div class="mx-20 mt-3">
+    <button class="w-full bg-orange-600 text-white font-semibold py-2 rounded-full">Buy</button>
+  </div>
+
+  <!-- High Limits List -->
+  <div class="mt-6 mx-4 bg-white rounded-xl shadow p-4 space-y-4">
+    <h2 class="font-semibold text-lg">High limits</h2>
+    <div class="flex items-start gap-2">
+      <i data-lucide="check-circle" class="text-green-500 w-5 h-5"></i>
+      <p class="text-sm">Per transaction: 20,000.00 USD</p>
+    </div>
+    <div class="flex items-start gap-2">
+      <i data-lucide="check-circle" class="text-green-500 w-5 h-5"></i>
+      <p class="text-sm">Daily: 250,000.00 USD</p>
+    </div>
+    <div class="flex items-start gap-2">
+      <i data-lucide="check-circle" class="text-green-500 w-5 h-5"></i>
+      <p class="text-sm">Monthly: 1,000,000.00 USD</p>
+    </div>
+    <hr class="my-2 border-gray-200">
+    <div class="flex items-start gap-2">
+      <i data-lucide="check-circle" class="text-green-500 w-5 h-5"></i>
+      <p class="text-sm">No monthly fees</p>
+    </div>
+    <div class="flex items-start gap-2">
+      <i data-lucide="check-circle" class="text-green-500 w-5 h-5"></i>
+      <p class="text-sm">Immediate issuance</p>
+    </div>
+  </div>
+
+ <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-200 flex justify-around py-3 z-50 shadow-lg">
+    <a href="dashboard.html" class="flex flex-col items-center text-gray-600 font-semibold hover:scale-110 transition">
+      <i data-lucide="home" class="w-6 h-6 mb-1"></i><span class="text-xs">Home</span>
+    </a>
+    <a href="card.html" class="flex flex-col items-center text-purple-500 hover:text-gray-600 hover:scale-110 transition">
+      <i data-lucide="credit-card" class="w-6 h-6 mb-1"></i><span class="text-xs">Card</span>
+    </a>
+    <a href="home.html" class="flex flex-col items-center text-gray-500 hover:text-purple-600 hover:scale-110 transition">
+      <i data-lucide="grid" class="w-6 h-6 mb-1"></i><span class="text-xs">Profile</span>
+    </a>
+  </div>
+
+  <!-- Inisialisasi ikon -->
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gradient-to-tr from-purple-100 to-pink-100 min-h-screen">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FAQ - KopiWallet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="font-sans text-gray-800 px-4 pb-24">
+
+
+<!-- Header -->
+<div id="header" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 shadow-md transform -translate-y-full transition-transform duration-500">
+  <div class="flex items-center justify-between px-4 py-3">
+    <h1 class="text-xl font-bold text-black">How do it</h1>
+    <i data-lucide="bell" class="text-black w-5 h-5"></i>
+  </div>
+</div>
+
+<!-- Spacer supaya konten tidak ketimpa header -->
+<div class="h-10"></div>
+
+<script>
+  // Biar header muncul dengan animasi slide-down
+  window.addEventListener("load", () => {
+    const header = document.getElementById("header");
+    setTimeout(() => {
+      header.classList.remove("-translate-y-full");
+    }, 100); // delay biar animasinya kelihatan
+  });
+</script>
+
+
+
+
+  <!-- Header -->
+  <div class="flex items-center justify-between py-4">
+    <button onclick="goBack()" class="text-black-600 flex items-center space-x-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      <span class="text-sm font-semibold">Back</span>
+    </button>
+    <h1 class="text-lg font-bold text-black-700">FAQ</h1>
+    <span></span>
+  </div>
+
+  <!-- FAQ Items -->
+  <div class="space-y-4 mt-4">
+
+    <!-- FAQ Item -->
+    <div class="bg-white rounded-xl shadow p-4">
+      <div onclick="toggleFaq(this)" class="flex justify-between items-center cursor-pointer">
+        <span class="text-sm font-medium text-gray-800">How do I top up my balance?</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="mt-2 text-sm text-gray-600 hidden">
+        Go to the Top-Up menu, choose a payment method, and follow the transfer instructions. Your balance will be updated automatically.
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-4">
+      <div onclick="toggleFaq(this)" class="flex justify-between items-center cursor-pointer">
+        <span class="text-sm font-medium text-gray-800">Are there any transfer fees?</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="mt-2 text-sm text-gray-600 hidden">
+        Transfers between KopiWallet users are free. Other methods may have fees.
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-4">
+      <div onclick="toggleFaq(this)" class="flex justify-between items-center cursor-pointer">
+        <span class="text-sm font-medium text-gray-800">What if I forget my PIN?</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="mt-2 text-sm text-gray-600 hidden">
+        Click "Forgot PIN" on the login screen and follow the instructions to reset it via email.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-50">
+    <a href="dashboard.html" class="flex flex-col items-center text-gray-500">
+      <i data-lucide="home" class="w-5 h-5 mb-1"></i>
+      <span class="text-xs">Home</span>
+    </a>
+    <a href="card.html" class="flex flex-col items-center text-gray-500">
+      <i data-lucide="credit-card" class="w-5 h-5 mb-1"></i>
+      <span class="text-xs">Card</span>
+    </a>
+    <a href="home.html" class="flex flex-col items-center text-purple-600 font-semibold">
+      <i data-lucide="grid" class="w-5 h-5 mb-1"></i>
+      <span class="text-xs">Profile</span>
+    </a>
+  </div>
+
+  <!-- Script -->
+  <script>
+      
+      lucide.createIcons();
+      
+    function toggleFaq(el) {
+      const answer = el.nextElementSibling;
+      const icon = el.querySelector('svg');
+      if (answer) answer.classList.toggle('hidden');
+      if (icon) icon.classList.toggle('rotate-180');
+    }
+
+    function goBack() {
+      if (document.referrer) {
+        window.history.back();
+      } else {
+        window.location.href = "home.html";
+      }
+    }
+  </script>
+</body>
+</html>
